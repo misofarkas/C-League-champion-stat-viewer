@@ -1,1 +1,1 @@
-# C-League-champion-stat-viewer
+League-champion-stat-viewer
