@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "League champion stat viewer", "League champion stat viewer\League champion stat viewer.csproj", "{B39FBB3F-1B64-449D-83EC-C3B40045841F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{D07BAA7C-F0C3-46D4-891B-84B55EE7FC3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B39FBB3F-1B64-449D-83EC-C3B40045841F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B39FBB3F-1B64-449D-83EC-C3B40045841F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B39FBB3F-1B64-449D-83EC-C3B40045841F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B39FBB3F-1B64-449D-83EC-C3B40045841F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D07BAA7C-F0C3-46D4-891B-84B55EE7FC3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D07BAA7C-F0C3-46D4-891B-84B55EE7FC3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D07BAA7C-F0C3-46D4-891B-84B55EE7FC3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D07BAA7C-F0C3-46D4-891B-84B55EE7FC3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8948E614-D2D8-4CCA-8E8B-FAE70ED8C435}
+	EndGlobalSection
+EndGlobal

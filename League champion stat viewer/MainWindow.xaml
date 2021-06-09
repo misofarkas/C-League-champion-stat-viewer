@@ -1,0 +1,80 @@
+﻿<Window x:Class="League_champion_stat_viewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:League_champion_stat_viewer"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        mc:Ignorable="d"
+        Title="League champion stat viewer" Height="450" Width="800">
+    
+        <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+            
+        <!-- User input -->
+        <WrapPanel>
+            <TextBlock Text="Summoner name:"/>
+            <TextBox x:Name="SummonerName" Text="Daezhar" Width="125" Margin="5,0,5,0"/>
+            <TextBlock Text="Server:" Margin="5,0,5,0"/>
+
+            <!-- Server ComboBox -->
+            <ComboBox Width="60" Margin="0,0,5,0">
+                <ComboBoxItem IsSelected="True">EUN1</ComboBoxItem>
+                <ComboBoxItem>EUW1</ComboBoxItem>
+                <ComboBoxItem>NA1</ComboBoxItem>
+                <ComboBoxItem>KR</ComboBoxItem>
+                <ComboBoxItem>LA1</ComboBoxItem>
+                <ComboBoxItem>LA2</ComboBoxItem>
+                <ComboBoxItem>OC1</ComboBoxItem>
+                <ComboBoxItem>BR1</ComboBoxItem>
+                <ComboBoxItem>RU</ComboBoxItem>
+                <ComboBoxItem>TR1</ComboBoxItem>
+                <ComboBoxItem>JP1</ComboBoxItem>
+            </ComboBox>
+
+            <!-- Buttons -->
+            <Button Content="Display Champions" Width="100" Click="OnClickSearchButton"/>
+            <Button Content="Load 100 Matches" Width="100" Margin="5,0,5,0" Click="OnClickLoad100Matches"/>
+            <Button Content="Load All Matches" Width="100" Margin="5,0,5,0" Click="OnClickLoadAllMatches"/>
+
+            <Image Height="18" gif:ImageBehavior.AnimatedSource="C:\Users\BlueH\source\repos\League champion stat viewer\League champion stat viewer\bin\Debug\net5.0-windows\images\loading_gif.gif" Margin="5,0,5,0"/>
+        </WrapPanel>
+        
+        <!-- Champion stat list -->
+        <DockPanel Grid.Row="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"  DockPanel.Dock="Left" Width="400">
+                <ListBox Name="icChampions" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="115" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="50" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding GamesPlayed}" Grid.Column="1"/>
+                                <TextBlock Text="{Binding TotalKills}" Grid.Column="2"/>
+                                <TextBlock Text="{Binding TotalDeaths}" Grid.Column="3"/>
+                                <TextBlock Text="{Binding TotalAssists}" Grid.Column="4"/>
+                                <TextBlock Text="{Binding TotalMinionsKilled}" Grid.Column="5"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+            <TextBlock Text="Space for more stats" Margin="50" FontSize="24"/>
+        </DockPanel>   
+        
+    </Grid>
+    
+    
+</Window>
