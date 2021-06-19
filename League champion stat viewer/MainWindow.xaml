@@ -7,22 +7,52 @@
         xmlns:local="clr-namespace:League_champion_stat_viewer"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
-        Title="League champion stat viewer" Height="450" Width="800">
-    
-        <Grid Margin="10">
+        Title="League champion stat viewer" Height="500" Width="900"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        
+        <Style TargetType="Button">
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+        </Style>
+
+        <Style x:Key ="TableHeader" TargetType="Button">
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        
+        <LinearGradientBrush x:Key="WindowBackgroundBrush">
+            <GradientStop Offset="0" Color="#0d8cc4"/>
+            <GradientStop Offset="1" Color="#c7d46a"/>
+        </LinearGradientBrush>
+    </Window.Resources>
+
+
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
             
         <!-- User input -->
         <WrapPanel>
-            <TextBlock Text="Summoner name:"/>
-            <TextBox x:Name="SummonerName" Text="Daezhar" Width="125" Margin="5,0,5,0"/>
+            <TextBlock Text="Summoner name:" Margin="5,0,5,0"/>
+            <TextBox x:Name="SummonerName" Text="Daezhar" Width="125"/>
             <TextBlock Text="Server:" Margin="5,0,5,0"/>
 
             <!-- Server ComboBox -->
-            <ComboBox Width="60" Margin="0,0,5,0">
+            <ComboBox Name="serverCode" Width="60">
                 <ComboBoxItem IsSelected="True">EUN1</ComboBoxItem>
                 <ComboBoxItem>EUW1</ComboBoxItem>
                 <ComboBoxItem>NA1</ComboBoxItem>
@@ -37,41 +67,86 @@
             </ComboBox>
 
             <!-- Buttons -->
-            <Button Content="Display Champions" Width="100" Click="OnClickSearchButton"/>
-            <Button Content="Load 100 Matches" Width="100" Margin="5,0,5,0" Click="OnClickLoad100Matches"/>
-            <Button Content="Load All Matches" Width="100" Margin="5,0,5,0" Click="OnClickLoadAllMatches"/>
+            <Button Content="Show stats" Width="auto" Click="OnClickShowStats"/>
+            <Button Content="Quick update" Width="auto" Click="OnClickQuickUpdate"/>
+            <Button Content="Load All Matches" Width="auto" Click="OnClickLoadAllMatches"/>
 
-            <Image Height="18" gif:ImageBehavior.AnimatedSource="C:\Users\BlueH\source\repos\League champion stat viewer\League champion stat viewer\bin\Debug\net5.0-windows\images\loading_gif.gif" Margin="5,0,5,0"/>
+            
+            <Image Height="18" Name="loadingGif" gif:ImageBehavior.AnimatedSource="Images\loading_gif.gif" Margin="5,0,5,0"/>
+            
         </WrapPanel>
-        
-        <!-- Champion stat list -->
-        <DockPanel Grid.Row="1">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"  DockPanel.Dock="Left" Width="400">
-                <ListBox Name="icChampions" HorizontalContentAlignment="Stretch">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="115" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="50" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text="{Binding GamesPlayed}" Grid.Column="1"/>
-                                <TextBlock Text="{Binding TotalKills}" Grid.Column="2"/>
-                                <TextBlock Text="{Binding TotalDeaths}" Grid.Column="3"/>
-                                <TextBlock Text="{Binding TotalAssists}" Grid.Column="4"/>
-                                <TextBlock Text="{Binding TotalMinionsKilled}" Grid.Column="5"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </ScrollViewer>
 
-            <TextBlock Text="Space for more stats" Margin="50" FontSize="24"/>
+        <WrapPanel Grid.Row="1">
+            <Button Name="GPButton" Content="Games Played" Width="auto" Click="OnClickSort" Style="{StaticResource TableHeader}" Margin="75,0,0,0"/>
+            <Button Name="WRButton" Content="Winrate" Width="auto" Click="OnClickSort" Style="{StaticResource TableHeader}"/>
+            <Button Name="KDAButton" Content="KDA" Width="auto" Click="OnClickSort" Style="{StaticResource TableHeader}"/>
+        </WrapPanel>
+
+        <DockPanel Grid.Row="2">
+            
+            <!-- Champion list -->
+            <Border CornerRadius="3" Background="Transparent" BorderBrush="FloralWhite" BorderThickness="3">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" DockPanel.Dock="Left" Width="350">
+                    <ListBox Name="lbChampions" HorizontalContentAlignment="Stretch" SelectionChanged="lbChampionsSelectionChanged"
+                         Background="Transparent" BorderBrush="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="75" />
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="75" />
+                                        <ColumnDefinition Width="25" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text="{Binding GamesPlayed}" Grid.Column="1"/>
+                                    <TextBlock Text="{Binding WinRate}" Grid.Column="2"/>
+                                    <TextBlock Text="{Binding KDA}" Grid.Column="3"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
+            </Border>
+            
+
+            <!-- Champion stats-->
+            <StackPanel Name="spChampionStats" Margin="20,0,0,0" DockPanel.Dock="Right">
+                <WrapPanel>
+                    <TextBlock Name="cName" FontSize="40" Width="300"/>
+                    <TextBlock Name="cGrade" FontSize="50" FontFamily="Times New Roman"/>
+                </WrapPanel>
+                
+
+                <TextBlock Name="cGamesPlayed"/>
+                <TextBlock Name="cWinrate"/>
+
+                <TextBlock Name="cKDA" Margin="0,10,0,0"/>
+                <WrapPanel>
+                    <TextBlock Name="cKills"/>
+                    <TextBlock Name="cDeaths" Margin="5,0,0,0"/>
+                    <TextBlock Name="cAssists" Margin="5,0,0,0"/>
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Name="cDouble"/>
+                    <TextBlock Name="cTriple" Margin="5,0,0,0"/>
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Name="cQuadra"/>
+                    <TextBlock Name="cPenta" Margin="5,0,0,0"/>
+                </WrapPanel>
+
+                <TextBlock Name="cMinionKills" Margin="0,10,0,0"/>
+                <TextBlock Name="cDamageToTurrets" />
+                <TextBlock Name="cDamageToChampions" />
+                <TextBlock Name="cShields" />
+                <TextBlock Name="cHeals" />
+
+                <TextBlock Name="cWardsPlaced" Margin="0,10,0,0" />
+                <TextBlock Name="cVisionScore" />
+                <TextBlock Name="cVisionWardsBought" />
+            </StackPanel>
+            
         </DockPanel>   
         
     </Grid>
