@@ -13,20 +13,7 @@ namespace DAL
 {
     public class APIMethods
     {
-        /*
-        public static string Get(string uri)
-        {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
-        }
-        */
         public static async Task<string> GetAsync(string url)
         {
             using var client = new HttpClient();
@@ -35,7 +22,6 @@ namespace DAL
         }
         public static async Task<string> GetSummonerPuuidAsync(string summonerName, string serverName, string APIKey)
         {
-            // server example = EUN1, EUW1, JP, KR ...
             var uri = $"https://{serverName}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}?api_key={APIKey}";
             var result = await GetAsync(uri);
             dynamic jsonResult = JsonConvert.DeserializeObject(result);
@@ -44,11 +30,8 @@ namespace DAL
 
         public static async Task<List<string>> GetSummonerMatchIDsAsync(string region, string  puuid, string APIKey)
         {
-            // region = EUROPE, AMERICAS, ASIA
             var matchIds = new List<string>();
             
-            
-
             var index = 0;
             bool stop = false;
             while (stop == false)
@@ -74,8 +57,8 @@ namespace DAL
 
         public static async Task<Match> GetMatchStatsAsync(string region, string puuid, string APIKey, string matchID)
         {
-            // region = EUROPE, AMERICAS, ASIA
             var uri = $"https://{region}.api.riotgames.com/lol/match/v5/matches/{matchID}?api_key={APIKey}";
+
             var result = await GetAsync(uri);
             dynamic jsonResult = JsonConvert.DeserializeObject(result);
             var match = new Match { };
@@ -93,8 +76,10 @@ namespace DAL
                         Kills = player["kills"],
                         Deaths = player["deaths"],
                         Assists = player["assists"],
-                        TotalMinionsKilled = player["totalMinionsKilled"],
+                        TotalMinionsKilled = player["totalMinionsKilled"] + player["neutralMinionsKilled"],
                         DamageDealtToTurrets = player["damageDealtToTurrets"],
+                        DoubleKills = player["doubleKills"],
+                        TripleKills = player["tripleKills"],
                         QuadraKills = player["quadraKills"],
                         PentaKills = player["pentaKills"],
                         TotalDamageDealtToChampions = player["totalDamageDealtToChampions"],

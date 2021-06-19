@@ -42,7 +42,8 @@ namespace DAL
                     champion = new ChampionStats
                     {
                         Name = match.ChampionName,
-                        Puuid = match.Puuid
+                        Puuid = match.Puuid,
+                        Grade = "-"
                     };
                     await db.ChampionStats.AddAsync(champion);
                 }
@@ -54,6 +55,8 @@ namespace DAL
                 champion.TotalAssists += match.Assists;
                 champion.TotalMinionsKilled += match.TotalMinionsKilled;
                 champion.TotalDamageDealtToTurrets += match.DamageDealtToTurrets;
+                champion.DoubleKills += match.DoubleKills;
+                champion.TripleKills += match.TripleKills;
                 champion.QuadraKills += match.QuadraKills;
                 champion.PentaKills += match.PentaKills;
                 champion.TotalDamageDealtToChampions += match.TotalDamageDealtToChampions;
@@ -86,43 +89,6 @@ namespace DAL
                 return await db.ChampionStats.Where(x => x.Puuid == puuid).ToListAsync();
             }
         }
-
-        public async Task UpdatePlayerMatchIDs ( string puuid, string latestMatchID, string oldestMatchID)
-        {
-            using (var db = new LoLDbContext())
-            {
-                var player = db.Player.SingleOrDefault(x => x.Puuid == puuid);
-                if (player == null)
-                {
-                    await db.Player.AddAsync(new Player { 
-                        Puuid = puuid,
-                        LatestMatchID = ConvertMatchIDToLong(latestMatchID),
-                        OldestMatchID = ConvertMatchIDToLong(oldestMatchID)
-                    });
-                    
-                }
-                else
-                {
-                    var latestMatchIDlong = ConvertMatchIDToLong(latestMatchID);
-                    var oldestMatchIDlong = ConvertMatchIDToLong(oldestMatchID);
-
-                    if (latestMatchIDlong > player.LatestMatchID)
-                        player.LatestMatchID = latestMatchIDlong;
-
-                    if (oldestMatchIDlong < player.OldestMatchID)
-                        player.OldestMatchID = oldestMatchIDlong;
-                }
-
-                await db.SaveChangesAsync();
-
-            }
-        }
-
-        private long ConvertMatchIDToLong(string matchID)
-        {
-            Int64.TryParse(matchID.Split("_")[1], out var ID);
-            return ID;
-        }
         
         
         public async Task<List<Match>> GetAllMatchesAsync(string puuid)
@@ -145,16 +111,20 @@ namespace DAL
                 if (index >= count)
                     break;
 
-                if (index % 100 == 0)
+                if (index % 100 == 90)
                     await Task.Delay(121000);
                 
                 try
                 {
                     await AddMatchAsync(await APIMethods.GetMatchStatsAsync(region, puuid, APIKey, id));
                 }
-                catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+                catch (DbUpdateException)
                 {
                     // Catch duplicate matches
+                }
+                catch (System.Net.Http.HttpRequestException)
+                {
+                    // Catch 404 match not found exception
                 }
                 
                 index++;

@@ -17,6 +17,8 @@ namespace DAL.Models
         public int Assists { get; set; }
         public int TotalMinionsKilled { get; set; }
         public int DamageDealtToTurrets { get; set; }
+        public int DoubleKills { get; set; }
+        public int TripleKills { get; set; }
         public int QuadraKills { get; set; }
         public int PentaKills { get; set; }
         public int TotalDamageDealtToChampions { get; set; }

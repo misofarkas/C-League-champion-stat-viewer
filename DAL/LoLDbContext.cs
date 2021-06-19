@@ -16,7 +16,6 @@ namespace DAL
             Initial Catalog=LoLDb; Integrated Security=true";
         public DbSet<Match> Matches { get; set; }
         public DbSet<ChampionStats> ChampionStats { get; set; }
-        public DbSet<Player> Player { get; set; }
         public LoLDbContext() : base()
         {
             //Database.EnsureDeleted();
@@ -40,10 +39,6 @@ namespace DAL
             modelBuilder.Entity<ChampionStats>().HasKey(m => new
             {
                 m.Name,
-                m.Puuid
-            });
-            modelBuilder.Entity<Player>().HasKey(m => new
-            {
                 m.Puuid
             });
         }
