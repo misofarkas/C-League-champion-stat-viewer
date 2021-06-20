@@ -1,19 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using DAL;
 using DAL.Models;
+using DAL.Export;
+using Microsoft.Win32;
 
 namespace League_champion_stat_viewer
 {
@@ -22,44 +18,44 @@ namespace League_champion_stat_viewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        //List<Match> Matches = new List<Match>();
-        Repository repo = new Repository();
+
         List<ChampionStats> champions = new List<ChampionStats>();
-        string APIKey = "RGAPI-bc491e65-8259-42d1-b896-b3ccd5fbc68c";
-        
 
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = this;
+
             spChampionStats.Visibility = Visibility.Hidden;
             loadingGif.Visibility = Visibility.Collapsed;
 
             GPButton.Visibility = Visibility.Collapsed;
             WRButton.Visibility = Visibility.Collapsed;
             KDAButton.Visibility = Visibility.Collapsed;
+            ExportButton.Visibility = Visibility.Collapsed;
         }
 
+        // Updates champion stats from matches, updtates champion's grades and
+        // displays champions in champion ListBox
         private async void OnClickShowStats(object sender, RoutedEventArgs e)
         {
             loadingGif.Visibility = Visibility.Visible;
-            var puuid = APIMethods.GetSummonerPuuidAsync(SummonerName.Text, serverCode.Text, APIKey);
 
+            string puuid;
             try
             {
-                await repo.UpdateChampionStatsFromMatches(SummonerName.Text, serverCode.Text, APIKey);
+                puuid = await APIMethods.GetSummonerPuuidAsync(SummonerName.Text, serverCode.Text);
+                await Repository.UpdateChampionStatsFromMatches(SummonerName.Text, serverCode.Text);
             }
-            catch (System.Net.Http.HttpRequestException)
+            catch (System.Net.Http.HttpRequestException exception)
             {
-                MessageBox.Show("404, summoner not found");
+                HandleException(exception);
                 return;
             }
 
-            await Grades.UpdateGrades(puuid.Result);
+            await Grades.UpdateGrades(puuid);
 
-            champions = (await repo.GetAllChampionStatsAsync(puuid.Result)).OrderByDescending(x => x.GamesPlayed).ToList();
-
-
+            champions = (await Repository.GetAllChampionStatsAsync(puuid)).OrderByDescending(x => x.GamesPlayed).ToList();
 
             lbChampions.ItemsSource = champions;
             lbChampions.Items.Refresh();
@@ -68,8 +64,12 @@ namespace League_champion_stat_viewer
             GPButton.Visibility = Visibility.Visible;
             WRButton.Visibility = Visibility.Visible;
             KDAButton.Visibility = Visibility.Visible;
+            ExportButton.Visibility = Visibility.Visible;
 
         }
+
+        // Can be triggered by Games played button, Winrate button and KDA button above champion ListBox
+        // Orders the champion by a chosen property and updates the content of champion ListBox
         private void OnClickSort(object sender, RoutedEventArgs e)
         {
             if (champions.Count == 0)
@@ -86,13 +86,13 @@ namespace League_champion_stat_viewer
             lbChampions.Items.Refresh();
         }
 
+        // Loads the last 20 matches for a given player into DB
         private async void OnClickQuickUpdate(object sender, RoutedEventArgs e)
         {
-            spChampionStats.Visibility = Visibility.Hidden;
             await LoadMatchesButtonAsync(20);
-            
         }
 
+        // Loads all matches for a given player into DB
         private async void OnClickLoadAllMatches(object sender, RoutedEventArgs e)
         {
             var messageBoxResult = MessageBox.Show("This can take up to 30 minutes, proceed?", "Confirmation", MessageBoxButton.YesNo);
@@ -101,39 +101,62 @@ namespace League_champion_stat_viewer
                 
         }
 
+        // Loads matches into DB
         private async Task LoadMatchesButtonAsync (int count)
         {
             loadingGif.Visibility = Visibility.Visible;
             var loadedSuccessfully = true;
             try
             {
-                await repo.LoadMatchesAsync(SummonerName.Text, serverCode.Text, DAL.Models.ServerDict.ServerDictionary[serverCode.Text], APIKey, count);
+                await Repository.LoadMatchesAsync(SummonerName.Text, serverCode.Text, ServerDict.ServerDictionary[serverCode.Text], count);
             }
 
             catch (System.Net.Http.HttpRequestException exception)
             {
-                if ((int)exception.StatusCode == 404)
-                {
-                    MessageBox.Show("404, summoner not found");
-                    loadedSuccessfully = false;
-                }
-                if ((int)exception.StatusCode == 403)
-                {
-                    MessageBox.Show("403, empty summoner name or APIKey expired");
-                    loadedSuccessfully = false;
-                }
-                if ((int)exception.StatusCode == 429)
-                {
-                    MessageBox.Show("429, rate limit exceeded");
-                    loadedSuccessfully = false;
-                }
+                loadedSuccessfully = false;
+                HandleException(exception);
             }
+
+            loadingGif.Visibility = Visibility.Collapsed;
             if (loadedSuccessfully)
                 MessageBox.Show("Matches loaded successfully");
+
+        }
+
+        // Handles exceptions that can arise from API
+        private void HandleException(System.Net.Http.HttpRequestException exception)
+        {
+            loadingGif.Visibility = Visibility.Collapsed;
+            if ((int)exception.StatusCode == 404)
+            {
+                MessageBox.Show("404, summoner not found");
+            }
+            if ((int)exception.StatusCode == 403)
+            {
+                MessageBox.Show("403, empty summoner name or APIKey expired");
+            }
+            if ((int)exception.StatusCode == 429)
+            {
+                MessageBox.Show("429, rate limit exceeded");
+            }
+        }
+
+        // Exports the current displayed champion list as a CSV file
+        private async void OnClickExport(object sender, RoutedEventArgs e)
+        {
+            loadingGif.Visibility = Visibility.Visible;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                ExportCSV.Export(champions, saveFileDialog.FileName);
+            }
 
             loadingGif.Visibility = Visibility.Collapsed;
         }
 
+        // Reacts to a change in champion ListBox selection
+        // Displays more in-depth stats about a selected champion
         private void lbChampionsSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
