@@ -10,3 +10,5 @@ C:\Users\BlueH\source\repos\League champion stat viewer\DAL\obj\Debug\net5.0\DAL
 C:\Users\BlueH\source\repos\League champion stat viewer\DAL\obj\Debug\net5.0\DAL.dll
 C:\Users\BlueH\source\repos\League champion stat viewer\DAL\obj\Debug\net5.0\ref\DAL.dll
 C:\Users\BlueH\source\repos\League champion stat viewer\DAL\obj\Debug\net5.0\DAL.pdb
+C:\Users\BlueH\source\repos\League champion stat viewer\DAL\bin\Debug\net5.0\Config\connectionString.txt
+C:\Users\BlueH\source\repos\League champion stat viewer\DAL\bin\Debug\net5.0\Config\riotApiKey.txt

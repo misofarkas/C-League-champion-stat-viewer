@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Q38M0+Jl3HtU/HLcQ8EvA0+0irVG1RnTXFDYbMMAcKg/xJxFNvQn2DhI1b3LmWgh0mAHVsw4HIDthBSWXQ9bTQ==",
+  "dgSpecHash": "GUY4qpNB4KG7KnrijXasOt2CKLmXJGdxjPmCKef4wngMo6k4EgQRTc7x4N8sxRTS6fUQ0mUxypnnMmUffnTb+A==",
   "success": true,
   "projectFilePath": "C:\\Users\\BlueH\\source\\repos\\League champion stat viewer\\DAL\\DAL.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\BlueH\\.nuget\\packages\\csvhelper\\27.1.0\\csvhelper.27.1.0.nupkg.sha512",
     "C:\\Users\\BlueH\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\BlueH\\.nuget\\packages\\microsoft.data.sqlclient\\2.0.1\\microsoft.data.sqlclient.2.0.1.nupkg.sha512",
     "C:\\Users\\BlueH\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\2.0.1\\microsoft.data.sqlclient.sni.runtime.2.0.1.nupkg.sha512",

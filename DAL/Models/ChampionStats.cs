@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper.Configuration.Attributes;
 
 namespace DAL.Models
 {
     public class ChampionStats
     {
+        [Ignore]
         public string Puuid { get; set; }
         public string Name { get; set; }
         public int GamesPlayed { get; set; }

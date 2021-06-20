@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,14 +12,13 @@ namespace DAL
 {
     public class LoLDbContext : DbContext
     {
-        private string connectionString =
-            @"server=(localdb)\MSSQLLocalDB; 
-            Initial Catalog=LoLDb; Integrated Security=true";
+
+        private string connectionString = File.ReadAllText($"Config{Path.DirectorySeparatorChar}connectionString.txt");
+        
         public DbSet<Match> Matches { get; set; }
         public DbSet<ChampionStats> ChampionStats { get; set; }
         public LoLDbContext() : base()
         {
-            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

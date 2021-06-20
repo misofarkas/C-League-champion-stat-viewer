@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class Repository
+    public static class Repository
     {
-        public async Task AddMatchAsync(Match match)
+        // Adds a single match into the DB
+        public static async Task AddMatchAsync(Match match)
         {
             using (var db = new LoLDbContext())
             {
@@ -19,9 +20,10 @@ namespace DAL
             }
         }
 
-        public async Task UpdateChampionStatsFromMatches(string summonerName, string serverName, string APIKey)
+        // Removes and updates all champion stats from matches saved in the DB for a given player
+        public static async Task UpdateChampionStatsFromMatches(string summonerName, string serverName)
         {
-            var puuid = await APIMethods.GetSummonerPuuidAsync(summonerName, serverName, APIKey);
+            var puuid = await APIMethods.GetSummonerPuuidAsync(summonerName, serverName);
             var matches = await GetAllMatchesAsync(puuid);
             await RemoveChampionStatsAsync(puuid);
 
@@ -30,8 +32,10 @@ namespace DAL
                 await AddOrUpdateChampionStats(match);
             }
         }
-        
-        private async Task AddOrUpdateChampionStats(Match match)
+
+        // If a champion does not exist in the DB for a given player,
+        // Create, update it's stats and add it to the DB
+        private static async Task AddOrUpdateChampionStats(Match match)
         {
             
             using (var db = new LoLDbContext())
@@ -70,7 +74,9 @@ namespace DAL
 
             }
         }
-        public async Task RemoveChampionStatsAsync(string puuid)
+
+        // Removes a champion record from the DB for a given player
+        public static async Task RemoveChampionStatsAsync(string puuid)
         {
             var playerChampionStats = await GetAllChampionStatsAsync(puuid);
             using (var db = new LoLDbContext())
@@ -82,16 +88,18 @@ namespace DAL
                 await db.SaveChangesAsync();
             }
         }
-        public async Task<List<ChampionStats>> GetAllChampionStatsAsync(string puuid)
+
+        // Returns a list of all champions corresponding to a player's puuid
+        public static async Task<List<ChampionStats>> GetAllChampionStatsAsync(string puuid)
         {
             using (var db = new LoLDbContext())
             {
                 return await db.ChampionStats.Where(x => x.Puuid == puuid).ToListAsync();
             }
         }
-        
-        
-        public async Task<List<Match>> GetAllMatchesAsync(string puuid)
+
+        // Returns a list of all matches corresponding to a player's puuid
+        public static async Task<List<Match>> GetAllMatchesAsync(string puuid)
         {
 
             using (var db = new LoLDbContext())
@@ -99,11 +107,13 @@ namespace DAL
                 return await db.Matches.Where(x => x.Puuid == puuid).ToListAsync();
             }
         }
-        
-        public async Task LoadMatchesAsync(string summonerName, string serverName, string region, string APIKey, int count = 5)
+
+        // Loads up to *count* last matches played for a given player
+        // and adds them to the DB
+        public static async Task LoadMatchesAsync(string summonerName, string serverName, string region, int count)
         {
-            var puuid = await APIMethods.GetSummonerPuuidAsync(summonerName, serverName, APIKey);
-            var matchIDs = await APIMethods.GetSummonerMatchIDsAsync(region, puuid, APIKey);
+            var puuid = await APIMethods.GetSummonerPuuidAsync(summonerName, serverName);
+            var matchIDs = await APIMethods.GetSummonerMatchIDsAsync(region, puuid);
 
             var index = 0;
             foreach (var id in matchIDs)
@@ -111,12 +121,14 @@ namespace DAL
                 if (index >= count)
                     break;
 
+                // In order not to exceed the API's rate-limit, there has to be a 2 minute delay
+                // after every 90 matches loaded
                 if (index % 100 == 90)
                     await Task.Delay(121000);
                 
                 try
                 {
-                    await AddMatchAsync(await APIMethods.GetMatchStatsAsync(region, puuid, APIKey, id));
+                    await AddMatchAsync(await APIMethods.GetMatchStatsAsync(region, puuid, id));
                 }
                 catch (DbUpdateException)
                 {

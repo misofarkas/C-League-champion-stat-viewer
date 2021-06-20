@@ -10,7 +10,7 @@ namespace DAL
 {
     public static class Grades
     {
-
+        // Base line stats for calculating champion's grade
         private static Dictionary<string, double> baselineStats = new Dictionary<string, double> 
         {
             {"winrate", 0.5 },
@@ -26,7 +26,7 @@ namespace DAL
             {"visionWardsBoughtSupp", 6 }
         };
 
-
+        // Updates grades for all champions for a given player
         public static async Task UpdateGrades(string puuid)
         {
 
@@ -43,14 +43,14 @@ namespace DAL
             }
         } 
 
-
+        // Calculates a score from champion stats, comparing it to base line stats
+        // and evaluates the grade
         private static string CalculateGrade(ChampionStats champion)
         {
-            
+            // Skip calculating grade for a champion with less than 3 games played
             if (champion.GamesPlayed < 3)
                 return "-";
             
-
             double score = 0;
 
             score += (champion.WinRate - baselineStats["winrate"]) * 150;
