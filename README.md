@@ -1,3 +1,4 @@
+![LCSW screenshot](https://user-images.githubusercontent.com/57560622/132664886-ae4ceeb4-c7c7-43b5-bc7b-67fe6c3ff368.png)
 League champion stat viewer - made by Michal Farkaš 492617
 
 SETUP:
